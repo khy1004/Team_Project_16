@@ -31,6 +31,22 @@ public class JsonToScriptableConverter : EditorWindow
             jsonFilePath = EditorUtility.OpenFilePanel("Select JSON File", "", "json");
         }
 
+        EditorGUILayout.LabelField("Selected File :", jsonFilePath);
+        EditorGUILayout.Space();
+        outputFolder = EditorGUILayout.TextField("Output Folder: ", outputFolder);
+        createDatabase = EditorGUILayout.Toggle("Create Database", createDatabase);
+        EditorGUILayout.Space();
+
+        if(GUILayout.Button("Convert to Scriptable Objects"))
+        {
+            if(string.IsNullOrEmpty(jsonFilePath))
+            {
+                EditorUtility.DisplayDialog("Error", "Please select a JSON file first!", "OK");
+                return;
+            }
+            ConvertJssonToScriptableObjects();
+        }
+
     }
 
     private void ConvertJssonToScriptableObjects()
@@ -38,7 +54,6 @@ public class JsonToScriptableConverter : EditorWindow
         if (!Directory.Exists(outputFolder))
         {
             Directory.CreateDirectory(outputFolder);
-
 
         }
 
@@ -55,15 +70,43 @@ public class JsonToScriptableConverter : EditorWindow
                 ItemSO itemSO = ScriptableObject.CreateInstance<ItemSO>();
 
                 itemSO.id = unit.id;
-                itemSO.name = unit.name;
+                itemSO.name = unit.UnitName;
                 itemSO.nameEng = unit.nameEng;
                 itemSO.description = unit.description;
                 
-                if(System.Enum.TryParse(UnitData.itemTypeString ))
-                
+                if(System.Enum.TryParse(unit.itemTypeString, out ItemType parsedType ))
+                {
+                    itemSO.itemType = parsedType;
+                }
+                else
+                {
+                    Debug.LogWarning($"아이템 {unit.itemTypeString}의 유효하지 않은 타입 : {unit.itemTypeString}");
+                }
+
                 itemSO.price = unit.price;
                 itemSO.power = unit.power;
 
+                string assetPath = $"{outputFolder}/Item_{unit.id.ToString("D4")}_{unit.nameEng}.asset";
+                AssetDatabase.CreateAsset(itemSO, assetPath );
+
+                itemSO.name = $"Item_{unit.id.ToString("D4")} + {unit.nameEng}";
+                createdUnits.Add( itemSO );
+
+                EditorUtility.SetDirty( itemSO );
+
+                if(createDatabase && createdUnits.Count > 0)
+                {
+                    ItemDataBaseSO dataBaseSO = ScriptableObject.CreateInstance<ItemDataBaseSO>();
+                    dataBaseSO.items = createdUnits;
+
+                    AssetDatabase.CreateAsset(dataBaseSO, $"{outputFolder}/ItemDatabase.asset");
+                    EditorUtility.SetDirty(dataBaseSO);
+                }
+
+                AssetDatabase.SaveAssets();
+                AssetDatabase.Refresh();
+
+                EditorUtility.DisplayDialog("Success", $"Successfully converted {createdUnits.Count} items to Scriptable Objects!", "OK");
 
 
             }

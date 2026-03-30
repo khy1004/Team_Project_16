@@ -8,6 +8,8 @@ public class ItemSO : ScriptableObject
     public string nameEng;
     public string description;
 
+
+    public ItemType itemType;
     public int price;
     public int power;
 
