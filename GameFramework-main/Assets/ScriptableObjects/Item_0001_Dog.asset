@@ -10,12 +10,12 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 12eec8242828fa945ba8dcdee4256531, type: 3}
-  m_Name: Item_0004 + Steel Shield
+  m_Name: Item_0001 + Dog
   m_EditorClassIdentifier: Assembly-CSharp::ItemSO
-  id: 4
-  UnitName: 
-  nameEng: Steel Shield
-  description: 
+  id: 1
+  UnitName: "\uBA4D\uBA4D\uC774"
+  nameEng: Dog
+  description: "\uC798 \uB6F4\uB2E4."
   itemType: 0
-  price: 0
-  power: 0
+  price: 10
+  power: 20
